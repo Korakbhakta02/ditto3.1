@@ -1,8 +1,6 @@
 #!groovy
 pipeline {
-    agent {
-        label "$DITTO_BUILD_NODE"
-    }
+    agent any
     parameters {
         string(name: 'EXTRA_MAVEN_ARGS', defaultValue: '', description: 'Additional maven arguments.')
         booleanParam(name: 'SKIP_SONAR_SCAN', defaultValue: false, description: 'Set to true to skip Sonarqube Scan.')
@@ -37,8 +35,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    args "$DITTO_DOCKER_ARGUMENTS"
-                    image "$DITTO_DOCKER_IMAGE_MAVEN_JDK_17"
+                    args '-v /home/jenkins-slave/.m2:/home/jenkins-slave/.m2:z --cpus=4 -u root'
+                    image 'maven:3.8.4-openjdk-17'
                     reuseNode true
                 }
             }
@@ -60,8 +58,8 @@ pipeline {
         stage('SonarQube Scan') {
             agent {
                 docker {
-                    args "$DITTO_DOCKER_ARGUMENTS"
-                    image "$DITTO_DOCKER_IMAGE_MAVEN_JDK_17"
+                    args '-v /home/jenkins-slave/.m2:/home/jenkins-slave/.m2:z --cpus=4 -u root'
+                    image 'maven:3.8.4-openjdk-17'
                     reuseNode true
                 }
             }
